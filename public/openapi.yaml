@@ -1,443 +1,55 @@
 openapi: 3.0.2
 info:
   version: 1.0.0
-  title: Businesses API
-  description: A simple API for a Yelp-like application.
-paths:
-  /businesses:
-    get:
-      summary: Fetch a list of businesses
-      description: |
-        Returns a paginated list of businesses.
-      operationId: getBusinesses
-      tags:
-        - Businesses
-      parameters:
-        - name: page
-          in: query
-          description: |
-            Specifies a specific page of businesses to request.
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  pageNumber:
-                    type: integer
-                    description: Page number of returned businesses.
-                    example: 1
-                  totalPages:
-                    type: integer
-                    description: Total number of pages available.
-                    example: 127
-                  pageSize:
-                    type: integer
-                    description: Number of businesses per page.
-                    example: 10
-                  totalCount:
-                    type: integer
-                    description: Total number of businesses.
-                    example: 1264
-                  lodgings:
-                    type: array
-                    description: The returned businesses.
-                    items:
-                      $ref: '#/components/schemas/Business'
-    post:
-      summary: Add a new business
-      description: >
-        Creates a new business with specified data and adds it to the
-        application's database.
-      operationId: addNewBusiness
-      tags:
-        - Businesses
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Business'
-      responses:
-        '201':
-          description: New business successfully added
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: Unique ID of the created business.
-                    example: 19
-        '400':
-          description: The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  '/businesses/{businessid}':
-    parameters:
-      - name: businessid
-        in: path
-        description: Unique ID of a business.
-        schema:
-          type: integer
-        example: 8
-        required: true
-    get:
-      summary: Fetch data for a specific business.
-      description: >
-        Returns complete data for a the business specified by `businessid`.
-      operationId: getBusiness
-      tags:
-        - Businesses
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Business'
-        '404':
-          description: Specified `businessid` not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update data for a specific business.
-      description: |
-        Replaces the data for the business specified by `businessid`.
-      operationId: replaceBusiness
-      tags:
-        - Businesses
-      requestBody:
-        description: |
-          Business data to replace data for the business specified by `businessid`.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Business'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Specified `businessid` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Remove a specific business from the database.
-      description: |
-        Completely removes the data for the business specified by `businessid`.
-      operationId: removeBusiness
-      tags:
-        - Businesses
-      responses:
-        '204':
-          description: Success
-        '404':
-          description: Specified `businessid` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /photos:
-    post:
-      summary: Add a new photo
-      description: >
-        Creates a new photo with specified data and adds it to the
-        application's database.
-      operationId: addNewPhoto
-      tags:
-        - Photos
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Photo'
-      responses:
-        '201':
-          description: New photo successfully added
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: Unique ID of the created photo.
-                    example: 10
-        '400':
-          description: The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  '/photos/{photoID}':
-    parameters:
-      - name: photoID
-        in: path
-        description: Unique ID of a photo.
-        schema:
-          type: integer
-        example: 0
-        required: true
-    get:
-      summary: Fetch data for a specific photo.
-      description: >
-        Returns complete data for a the photo specified by `photoID`.
-      operationId: getPhoto
-      tags:
-        - Photos
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '404':
-          description: Specified `photoID` not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update data for a specific photo.
-      description: >
-        Replaces the data for the photo specified by `photo`.
-      operationId: replacePhoto
-      tags:
-        - Photos
-      requestBody:
-        description: >
-          Photo data to replace data for the photo specified by `photoID`.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Photo'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: >
-            The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: >
-            The request tried to change the `userid` or the `businessid` for a photo.  Once a photo is created, these cannot be changed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Specified `photoID` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Remove a specific photo from the database.
-      description: >
-        Completely removes the data for the photo specified by `photoID`.
-      operationId: removePhoto
-      tags:
-        - Photos
-      responses:
-        '204':
-          description: Success
-        '404':
-          description: Specified `photoID` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /reviews:
-    post:
-      summary: Add a new review
-      description: >
-        Creates a new review with specified data and adds it to the
-        application's database.
-      operationId: addNewReview
-      tags:
-        - Reviews
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Review'
-      responses:
-        '201':
-          description: New review successfully added
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: Unique ID of the created review.
-                    example: 10
-        '400':
-          description: >
-            The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: >
-            The specified user has already posted a review for the specified business.  A given user may only post one review for a given business.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  '/reviews/{reviewID}':
-    parameters:
-      - name: reviewID
-        in: path
-        description: Unique ID of a review.
-        schema:
-          type: integer
-        example: 0
-        required: true
-    get:
-      summary: Fetch data for a specific review.
-      description: >
-        Returns complete data for a the review specified by `reviewID`.
-      operationId: getReview
-      tags:
-        - Reviews
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Review'
-        '404':
-          description: Specified `reviewID` not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update data for a specific review.
-      description: >
-        Replaces the data for the review specified by `review`.
-      operationId: replaceReview
-      tags:
-        - Reviews
-      requestBody:
-        description: >
-          Review data to replace data for the review specified by `reviewID`.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Review'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: >
-            The request body was either not present or did not contain all of the required fields.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: >
-            The request tried to change the `userid` or the `businessid` for a review.  Once a review is created, these cannot be changed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Specified `reviewID` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Remove a specific review from the database.
-      description: >
-        Completely removes the data for the review specified by `reviewID`.
-      operationId: removeReview
-      tags:
-        - Reviews
-      responses:
-        '204':
-          description: Success
-        '404':
-          description: Specified `reviewID` not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+  title: The Tarpaulin API
+  description: API for an "alternative" to Canvas.
   
+paths:
   /users:
     post:
-      summary: Add a new application user
+      summary: Create a new User.
       description: >
-        Creates a new user with specified data and adds it to the
-        application's database.
-      operationId: addNewUser
+        Create and store a new application User with specified data and adds it to the application's database.  Only an authenticated User with 'admin' role can create users with the 'admin' or 'instructor' roles.
+      operationId: createUser
       tags:
         - Users
-        - NewStuff
       requestBody:
         required: true
+        description: A User object.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: New user successfully added
+          description: New User successfully added
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   id:
-                    type: integer
-                    description: Unique ID of the created user.
-                    example: 19
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      Unique ID of the created User.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+                    example: "123"
         '400':
-          description: The request body was either not present or did not contain all of the required fields.
+          description: >
+            The request body was either not present or did not contain a valid User object.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
   /users/login:
     post:
       summary: Log in a User.
@@ -446,17 +58,16 @@ paths:
       operationId: authenticateUser
       tags:
         - Users
-        - NewStuff
       requestBody:
         required: true
         description: >
-          Email address and plain-text password for the user being authenticated.
+          Email address and plain-text password for the User being authenticated.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
             example:
-              email: TheLastJedi@gmail.com
+              email: jdoe@oregonstate.edu
               password: hunter2
       responses:
         '200':
@@ -471,7 +82,6 @@ paths:
                     description: >
                       A JWT authentication token.
                     example: aaaaaaaa.bbbbbbbb.cccccccc
-                    
         '400':
           description: >
             The request body was either not present or did not contain all of the required fields.
@@ -494,22 +104,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
                 
-  '/users/{userID}':
+  /users/{id}:
     parameters:
-      - name: userID
+      - name: id
         in: path
-        description: Unique ID of a user.
+        description: >
+          Unique ID of a User.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
         schema:
-          type: integer
-        example: 5
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
         required: true
+        
     get:
-      summary: Fetch data for a specific user.
+      summary: Fetch data about a specific User.
       description: >
-        Returns complete data for a the user specified by `userID`.
-      operationId: getUser
+        Returns information about the specified User.  If the User has the 'instructor' role, the response should include a list of the IDs of the Courses the User teaches (i.e. Courses whose `instructorId` field matches the ID of this User).  If the User has the 'student' role, the response should include a list of the IDs of the Courses the User is enrolled in.  Only an authenticated User whose ID matches the ID of the requested User can fetch this information.
+      operationId: getUserById
       tags:
-        - NewStuff
         - Users
       responses:
         '200':
@@ -517,264 +130,773 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: Specified `userID` not found.  This may be returned if a user is not authorized to access the requested data.
+                $ref: '#/components/schemas/Course'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  
-  /users/{userid}/businesses:
-    parameters:
-      - name: userid
-        in: path
-        description: Unique ID of a user.
-        schema:
-          type: integer
-        example: 0
-        required: true
-    get:
-      summary: Fetch a user's owned businesses.
-      description: >
-        Returns a list of all of the businesses owned by the user specified by `userid`.
-      operationId: getUserBusinesses
-      tags:
-        - Users
-      responses:
-        200:
-          description: Success
+        '404':
+          description: Specified Course `id` not found.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  lodgings:
-                    type: array
-                    description: The businesses owned by the specified user.
-                    items:
-                      $ref: '#/components/schemas/Business'
+                $ref: '#/components/schemas/Error'
 
-  /users/{userid}/reviews:
-    parameters:
-      - name: userid
-        in: path
-        description: Unique ID of a user.
-        schema:
-          type: integer
-        example: 21
-        required: true
+  /courses:
     get:
-      summary: Fetch a user's reviews.
+      summary: Fetch the list of all Courses.
       description: >
-        Returns a list of all of the reviews written by the user specified by `userid`.
-      operationId: getUserReviews
+        Returns the list of all Courses.  This list should be paginated.  The Courses returned should not contain the list of students in the Course or the list of Assignments for the Course.
+      operationId: getAllCourses
       tags:
-        - Users
+        - Courses
+      parameters:
+        - name: page
+          in: query
+          description: >
+            Page of Courses to fetch.
+          schema:
+            type: integer
+            example: 3
+            default: 1
+        - name: subject
+          in: query
+          description: >
+            Fetch only Courses with the specified subject code.
+          schema:
+            type: string
+            example: "CS"
+        - name: number
+          in: query
+          description: >
+            Fetch only Courses with the specified course number.
+          schema:
+            type: string
+            example: "493"
+        - name: term
+          in: query
+          description: >
+            Fetch only Courses in the specified academic term.
+          schema:
+            type: string
+            example: "sp19"
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  lodgings:
+                  submissions:
                     type: array
-                    description: The reviews written by the specified user.
                     items:
-                      $ref: '#/components/schemas/Review'
+                      $ref: '#/components/schemas/Course'
+                
+    post:
+      summary: Create a new course.
+      description: >
+        Creates a new Course with specified data and adds it to the application's database.  Only an authenticated User with 'admin' role can create a new Course.
+      operationId: createCourse
+      tags:
+        - Courses
+      requestBody:
+        required: true
+        description: A Course object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+      responses:
+        '201':
+          description: New Course successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      Unique ID of the created Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+                    example: "123"
+        '400':
+          description: >
+            The request body was either not present or did not contain a valid Course object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /courses/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: >
+          Unique ID of a Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+        schema:
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
+        required: true
+        
+    get:
+      summary: Fetch data about a specific Course.
+      description: >
+        Returns summary data about the Course, excluding the list of students enrolled in the course and the list of Assignments for the course.
+      operationId: getCourseById
+      tags:
+        - Courses
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Specified Course `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    patch:
+      summary: Update data for a specific Course.
+      description: >
+        Performs a partial update on the data for the Course.  Note that enrolled students and assignments cannot be modified via this endpoint.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can update Course information.
+      operationId: updateCourseById
+      tags:
+        - Courses
+      requestBody:
+        description: >
+          Partial updates to be applied to the specified Course.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: >
+            The request body was either not present or did not contain any fields related to Course objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Course `id` not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    delete:
+      summary: Remove a specific Course from the database.
+      description: >
+        Completely removes the data for the specified Course, including all enrolled students, all Assignments, etc.  Only an authenticated User with 'admin' role can remove a Course.
+      operationId: removeCourseById
+      tags:
+        - Courses
+      responses:
+        '204':
+          description: Success
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Course `id` not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /courses/{id}/students:
+    parameters:
+      - name: id
+        in: path
+        description: >
+          Unique ID of a Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+        schema:
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
+        required: true
+    get:
+      summary: Fetch a list of the students enrolled in the Course.
+      description: >
+        Returns a list containing the User IDs of all students currently enrolled in the Course.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can fetch the list of enrolled students.
+      operationId: getStudentsByCourseId
+      tags:
+        - Courses
+      responses:
+        '200':
+          description: >
+            Array of User IDs for students enrolled in the Course.  Exact type/format of IDs will depend on your implementation but each will likely be either an integer or a string.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  students:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: integer
+                        - type: string
+                    example: [ "123", "456" ]
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Course `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    post:
+      summary: Update enrollment for a Course.
+      description: >
+        Enrolls and/or unenrolls students from a Course.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can update the students enrolled in the Course.
+      operationId: updateEnrollmentByCourseId
+      tags:
+        - Courses
+      requestBody:
+        required: true
+        description: >
+          Arrays of User IDs for students to be enrolled/unenrolled in the Course.  Exact type/format of IDs will depend on your implementation but each will likely be either an integer or a string.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                add:
+                  type: array
+                  items:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                  description: Students to be enrolled in the Course.
+                  example: [ "123", "456" ]
+                remove:
+                  type: array
+                  items:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                  description: Students to be unenrolled from the Course.
+                  example: [ "123", "456" ]
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: >
+            The request body was either not present or did not contain the fields described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Course `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /courses/{id}/roster:
+    parameters:
+      - name: id
+        in: path
+        description: >
+          Unique ID of a Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+        schema:
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
+        required: true
+    get:
+      summary: Fetch a CSV file containing list of the students enrolled in the Course.
+      description: >
+        Returns a CSV file containing information about all of the students currently enrolled in the Course, including names, IDs, and email addresses.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can fetch the course roster.
+      operationId: getRosterByCourseId
+      tags:
+        - Courses
+      responses:
+        '200':
+          description: >
+            A CSV file containing information about all of the students currently enrolled in the Course, including names, IDs, and email addresses.
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  123,"Jane Doe",doej@oregonstate.edu
+                  ...
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Course `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
-  /users/{userid}/photos:
+  /courses/{id}/assignments:
     parameters:
-      - name: userid
+      - name: id
         in: path
-        description: Unique ID of a user.
+        description: >
+          Unique ID of a Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
         schema:
-          type: integer
-        example: 21
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
         required: true
     get:
-      summary: Fetch a user's photos.
+      summary: Fetch a list of the Assignments for the Course.
       description: >
-        Returns a list of all of the photos posted by the user specified by `userid`.
-      operationId: getUserPhotos
+        Returns a list containing the Assignment IDs of all Assignments for the Course.
+      operationId: getAssignmentsByCourseId
       tags:
-        - Users
+        - Courses
       responses:
-        200:
+        '200':
+          description: >
+            Array of Assignment IDs for all of the Course's Assignments.  Exact type/format of IDs will depend on your implementation but each will likely be either an integer or a string.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: integer
+                        - type: string
+                    example: [ "123", "456" ]
+        '404':
+          description: Specified Course `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assignments:
+    post:
+      summary: Create a new Assignment.
+      description: >
+        Create and store a new Assignment with specified data and adds it to the application's database.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can create an Assignment.
+      operationId: createAssignment
+      tags:
+        - Assignments
+      requestBody:
+        required: true
+        description: An Assignment object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        '201':
+          description: New Assignment successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      Unique ID of the created Assignment.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+                    example: "123"
+        '400':
+          description: >
+            The request body was either not present or did not contain a valid Assignment object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assignments/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: >
+          Unique ID of an Assignment.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+        schema:
+          oneOf:
+            - type: integer
+            - type: string
+        example: "123"
+        required: true
+
+    get:
+      summary: Fetch data about a specific Assignment.
+      description: >
+        Returns summary data about the Assignment, excluding the list of Submissions.
+      operationId: getAssignmentById
+      tags:
+        - Assignments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+        '404':
+          description: Specified Assignment `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Update data for a specific Assignment.
+      description: >
+        Performs a partial update on the data for the Assignment.  Note that submissions cannot be modified via this endpoint.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can update an Assignment.
+      operationId: updateAssignmentById
+      tags:
+        - Assignments
+      requestBody:
+        description: >
+          Partial updates to be applied to the specified Assignment.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: >
+            The request body was either not present or did not contain any fields related to Assignment objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Assignment `id` not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Remove a specific Assignment from the database.
+      description: >
+        Completely removes the data for the specified Assignment, including all submissions.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can delete an Assignment.
+      operationId: removeAssignmentsById
+      tags:
+        - Assignments
+      responses:
+        '204':
+          description: Success
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Assignment `id` not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assignments/{id}/submissions:
+    parameters:
+      - name: id
+        in: path
+        description: >
+          Unique ID of an Assignment.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+        schema:
+          oneOf:
+            - type: integer
+            - type: string
+          example: "123"
+        required: true
+
+    get:
+      summary: Fetch the list of all Submissions for an Assignment.
+      description: >
+        Returns the list of all Submissions for an Assignment.  This list should be paginated.  Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can fetch the Submissions for an Assignment.
+      operationId: getSubmissionsByAssignmentId
+      tags:
+        - Assignments
+      parameters:
+        - name: page
+          in: query
+          description: >
+            Page of Submissions to fetch.
+          schema:
+            type: integer
+            example: 3
+            default: 1
+        - name: studentId
+          in: query
+          description: >
+            Fetch assignments only for the specified student ID.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+          schema:
+            oneOf:
+            - type: integer
+            - type: string
+          example: "123"
+      responses:
+        '200':
           description: Success
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  lodgings:
+                  submissions:
                     type: array
-                    description: The photos posted by the specified user.
                     items:
-                      $ref: '#/components/schemas/Photo'
+                      $ref: '#/components/schemas/Submission'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Assignment `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    post:
+      summary: Create a new Submission for an Assignment.
+      description: >
+        Create and store a new Assignment with specified data and adds it to the application's database.  Only an authenticated User with 'student' role who is enrolled in the Course corresponding to the Assignment's `courseId` can create a Submission.
+      operationId: createSubmission
+      tags:
+        - Assignments
+      requestBody:
+        required: true
+        description: A Submission object.
+        content:
+          multipart/formdata:
+            schema:
+              $ref: '#/components/schemas/Submission'
+      responses:
+        '201':
+          description: New Submission successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      Unique ID of the created Submission.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+                    example: "123"
+        '400':
+          description: >
+            The request body was either not present or did not contain a valid Submission object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: >
+            The request was not made by an authenticated User satisfying the authorization criteria described above.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Specified Assignment `id` not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
     User:
       description: >
-        An object representing information about an application user.
+        An object representing information about a Tarpaulin application user.
       type: object
       properties:
         name:
           type: string
-          description: Real name of the user.  This is required when creating a new User.
-          example: Luke Skywalker
+          description: Full name of the User.
+          example: Jane Doe
         email:
           type: string
-          description: The user's email address.  This is required to be unique among all Users.
-          example: TheLastJedi@gmail.com
+          description: >
+            Email address for the User.  This is required to be unique among all Users.
+          example: doej@oregonstate.edu
         password:
           type: string
-          description: The user's plaintext password.  This is required when creating a new User and when logging in.
+          description: >
+            The User's plain-text password.  This is required when creating a new User and when logging in.
           example: hunter2
-        admin:
-          type: boolean
-          description: Boolean flag indicating whether the user has admin permissions.
-          default: false
-      required:
-        - name
-        - email
-        - password
-        
-    Business:
+        role:
+          type: string
+          enum: [admin, instructor, student]
+          description: >
+            Permission role of the User.  Can be either 'admin', 'instructor', or 'student'.
+          default: student
+          
+    Course:
       description: >
-        An object representing information about a single business.
+        An object representing information about a specific course.
       type: object
       properties:
-        ownerid:
+        subject:
+          type: string
+          description: Short subject code.
+          example: CS
+        number:
+          type: string
+          description: Course number.
+          example: 493
+        title:
+          type: string
+          description: Course title.
+          example: Cloud Application Development
+        term:
+          type: string
+          description: Academic term in which Course is offered.
+          example: sp19
+        instructorId:
+          oneOf:
+            - type: integer
+            - type: string
+          description: >
+            ID for Course instructor.  Exact type/format will depend on your implementation but will likely be either an integer or a string.  This ID must correspond to a User with the 'instructor' role.
+          example: "123"
+          
+    Assignment:
+      description: >
+        An object representing information about a single assignment.
+      type: object
+      properties:
+        courseId:
+          oneOf:
+            - type: integer
+            - type: string
+          description: >
+            ID of the Course associated with the Assignment.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+          example: "123"
+        title:
+          type: string
+          description: Assignment description.
+          example: Assignment 3
+        points:
           type: integer
+          description: Possible points for the Assignment.
+          example: 100
+        due:
+          type: string
+          format: date-time
           description: >
-            The ID of the user who owns this business.  This is required when creating or updating a business.
-          example: 16
-        name:
-          type: string
-          description: Name of the business.
-          example: American Dream Pizza
-        address:
-          type: string
-          description: Street address of the business.
-          example: 2525 NW Monroe Ave.
-        city:
-          type: string
-          description: The city in which the business resides.
-          example: Corvallis
-        state:
-          type: string
-          description: The state in which the business resides.
-          example: OR
-        zip:
-          type: string
-          description: The zip code of the city in which the business resides.
-          example: '97330'
-        phone:
-          type: string
-          description: The business' phone number.
-          example: '541-757-1713'
-        category:
-          type: string
-          description: The business' category.
-          example: 'Restaurant'
-        subcategory:
-          type: string
-          description: The business' subcategory.
-          example: 'Pizza'
-        website:
-          type: string
-          description: The business' website URL.
-          example: 'http://adpizza.com'
-        email:
-          type: string
-          description: The business' email address.
-          example: 'brian@adpizza.com'
-        reviews:
-          type: array
-          description: >
-            An array of reviews of the business.  These are only returned when fetching detailed information about a business.
-          items:
-            $ref: '#/components/schemas/Review'
-        photos:
-          type: array
-          description: >
-            An array of photos of the business.  These are only returned when fetching detailed information about a business.
-          items:
-            $ref: '#/components/schemas/Photo'
-      required:
-        - ownerid
-        - name
-        - address
-        - city
-        - state
-        - zip
-        - phone
-        - category
-        - subcategory
+            Date and time Assignment is due.  Should be in ISO 8601 format.
+          example: "2019-06-14T17:00:00-07:00"
 
-    Photo:
+    Submission:
       description: >
-        An object representing information about a photo of a business.
+        An object representing information about a single student submission for an Assignment.
       type: object
       properties:
-        userid:
-          type: integer
+        assignmentId:
+          oneOf:
+            - type: integer
+            - type: string
           description: >
-            The ID of the user associated with this photo.  This is required when creating or updating a photo.
-          example: 7
-        businessid:
-          type: integer
+            ID of the Assignment to which the Submission corresponds.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+          example: "123"
+        studentId:
+          oneOf:
+            - type: integer
+            - type: string
           description: >
-            The ID of the business associated with this photo.  This is required when creating or updating a photo.
-          example: 3
-        caption:
+            ID of the Student who created the submission.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+          example: "123"
+        timestamp:
           type: string
-          description: Caption text for the photo
-          example: "Kale!"
-      required:
-        - userid
-        - businessid
-
-    Review:
-      description: >
-        An object representing information about a review of a business.
-      type: object
-      properties:
-        userid:
-          type: integer
+          format: date-time
           description: >
-            The ID of the user associated with this review.  This is required when creating or updating a review.
-          example: 7
-        businessid:
-          type: integer
-          description: >
-            The ID of the business associated with this review.  This is required when creating or updating a review.
-          example: 3
-        dollars:
-          type: integer
-          description: A rating of the expensiveness of a business.  Must be an integer between 1 and 4.
-          example: 3
-          minimum: 1
-          maximum: 4
-        stars:
-          type: number
-          description: A rating of the quality of a business.  Must be an number between 0 and 5.
-          example: 5
-          minimum: 0
-          maximum: 5
-        review:
+            Date and time Submission was made.  Should be in ISO 8601 format.
+          example: "2019-06-14T17:00:00-07:00"
+        file:
           type: string
-          description: Textual business review.
-          example: "Great produce!"
-      required:
-        - userid
-        - businessid
-        - dollars
-        - stars
+          description: >
+            When the Submission is being created, this will be the binary data contained in the submitted file.  When Submission information is being returned from the API, this will contain the URL from which the file can be downloaded.
 
     Error:
       description: >
@@ -783,20 +905,16 @@ components:
       properties:
         error:
           type: string
-          description: A message describing the error.
+          description: A message describing the Error.
+
 tags:
-  - name: NewStuff
-    description: >
-      New things to implement for this assignment.
-  - name: Businesses
-    description: >
-      API endpoints related to business resources.
-  - name: Photos
-    description: >
-      API endpoints related to photo resources.
-  - name: Reviews
-    description: >
-      API endpoints related to review resources.
   - name: Users
     description: >
-      API endpoints related to user resources.
+      API endpoints related to application Users.
+  - name: Courses
+    description: >
+      API endpoints related to Courses.
+  - name: Assignments
+    description: >
+      API endpoints related to Assignments.
+  
