@@ -2,7 +2,7 @@ version: '3.7'
 services:
   api:
     build: .
-    image: assignment-4-api
+    image: assignment-final-api
     restart: always
     ports:
       - 8000:8000
@@ -12,11 +12,6 @@ services:
       MONGO_PASSWORD: ${MONGO_PASSWORD}
       MONGO_HOST: mongodb
       MONGO_PORT: 27017
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
-      RABBITMQ_PORT: 5672
 
   mongodb:
     image: mongo:latest
@@ -30,18 +25,6 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
       MONGO_USER: ${MONGO_USER}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
-
-  rabbit:
-    image: rabbitmq:3-management
-    restart: always
-    hostname: ${RABBITMQ_HOST}
-    ports:
-      - 15672:15672
-      - 5672:5672
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
 
 volumes:
   mongo-data:
