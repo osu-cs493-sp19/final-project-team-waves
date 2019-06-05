@@ -1,13 +1,8 @@
-
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const fs = require('fs')
 
 const api = require('./api');
-const { connectToDB } = require('./lib/mongo');
-
-const {getDownloadStreamByFilename} = require('./models/image')
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -33,9 +28,6 @@ app.use('*', function (req, res, next) {
   });
 });
 
-connectToDB(async () => {
-
-  app.listen(port, () => {
-    console.log("== Server is running on port", port);
-  });
+app.listen(port, function() {
+  console.log("== Server is running on port", port);
 });
