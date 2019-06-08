@@ -19,7 +19,7 @@ async function insertAssignment(assignment) {
     const collection = getAssignmentsCollection();
     const result = await collection.insertOne(assignmentToInsert);
 
-    return result.insertId;
+    return result.insertedId;
 }
 
 async function getAssignmentById(id) {
@@ -32,7 +32,7 @@ async function getAssignmentById(id) {
     return assignment;
 }
 
-async function updateAssigmentById(id, assignment) {
+async function updateAssignmentById(id, assignment) {
     const assignmentValues = extractValidFields(assignment, ASSIGNMENT_SCHEMA);
     const collection = getAssignmentsCollection();
 
@@ -58,6 +58,6 @@ module.exports = {
     ASSIGNMENT_SCHEMA,
     insertAssignment,
     getAssignmentById,
-    updateAssigmentById,
+    updateAssignmentById,
     deleteAssignmentById
 };
