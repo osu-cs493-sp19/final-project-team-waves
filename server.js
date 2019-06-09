@@ -1,3 +1,4 @@
+const { connectToDB } = require("./lib/mongo");
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -24,12 +25,13 @@ app.use(express.static('public'));
  */
 app.use('/', api);
 
-app.use('*', function (req, res, next) {
+app.use('*', function (req, res) {
   res.status(404).json({
     error: "Requested resource " + req.originalUrl + " does not exist"
   });
 });
 
+<<<<<<< HEAD
 const doDB = () => {
   // Makes sure server only starts if there is a connection to the db
   connectToDB().then(() => {
@@ -45,3 +47,23 @@ const doDB = () => {
 }
 
 doDB()
+=======
+function startServer() {
+  connectToDB()
+    .then(() => {
+      app.listen(port, function() {
+        console.log("== Server is running on port", port);
+      });
+    })
+    .catch((err) => {
+      console.log("Error connecting to mongodb");
+      console.log(err);
+
+      setTimeout(() => {
+        startServer
+      }, 2500);
+    });
+}
+
+startServer();
+>>>>>>> master
