@@ -31,23 +31,6 @@ app.use('*', function (req, res) {
   });
 });
 
-<<<<<<< HEAD
-const doDB = () => {
-  // Makes sure server only starts if there is a connection to the db
-  connectToDB().then(() => {
-    console.log("Trying to connect to database callback")
-    app.listen(port, function() {
-      console.log("== Server is running on port", port);
-    });
-  }).catch(err => {
-    console.log("err")
-    console.log(err)
-    setTimeout(doDB, 3000)
-  })
-}
-
-doDB()
-=======
 function startServer() {
   connectToDB()
     .then(() => {
@@ -66,4 +49,3 @@ function startServer() {
 }
 
 startServer();
->>>>>>> master
