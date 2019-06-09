@@ -5,12 +5,12 @@
 
 const router = require('express').Router();
 
-const { getDBReference } = require('../lib/mongo');
+const { getDBRef } = require('../lib/mongo');
 
 router.get('/', (req, res, next) => {
     console.log("GET courses/")
     try {
-        const db = getDBReference();
+        const db = getDBRef();
         console.log("db", db)
         const collection = db.collection('courses');
         let count = 0;
