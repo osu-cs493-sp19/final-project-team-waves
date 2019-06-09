@@ -7,7 +7,11 @@ const router = require('express').Router();
 
 const { getDBRef } = require('../lib/mongo');
 
-router.get('/', (req, res, next) => {
+const { validateAgainstSchema } = require('../lib/validation')
+
+const { CourseSchema, insertNewCourse } = require('../models/courses')
+
+router.get('/', async (req, res, next) => {
     console.log("GET courses/")
     try {
         const db = getDBRef();
@@ -34,7 +38,7 @@ router.get('/', (req, res, next) => {
          */
         const start = (page - 1) * numPerPage;
         const end = start + numPerPage;
-        const pageCourses = collection.find({})
+        const pageCourses = await collection.find({})
             .sort({ _id: 1 })
             .skip(lastPage)
             .limit(numPerPage)
@@ -71,12 +75,24 @@ router.get('/', (req, res, next) => {
     }
 })
 
-router.post('/', (req, res, next) => {
-    try {
-        res.status(200).send();
-    } catch (err) {
-        next(err);
-    }
+router.post('/', async (req, res, next) => {
+    if (validateAgainstSchema(req.body, CourseSchema)) {
+        try {
+          const id = await insertNewCourse(req.body);
+          res.status(201).send({
+            id: id
+          });
+        } catch (err) {
+          console.error(err);
+          res.status(500).send({
+            error: "Failed to insert lodging.  Try again later."
+          });
+        }
+      } else {
+        res.status(400).send({
+          err: "Request body does not contain a valid Course."
+        });
+      }
 })
 
 router.get('/:id', (req, res, next) => {
