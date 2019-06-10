@@ -1,5 +1,6 @@
 
 const { getDBRef } = require('../lib/mongo');
+const { ObjectId } = require('mongodb')
 
 
 /*
@@ -45,3 +46,21 @@ exports.insertNewCourse = async function (course) {
   const result = await collection.insertOne(course);
   return result.insertedId;
 };
+
+exports.getCourseById = async function (id) {
+  const db = getDBRef();
+  const collection = db.collection('courses')
+  const results =  await collection
+      .find({ _id: new ObjectId(id) })
+      .toArray();
+  return results[0]
+}
+
+exports.deleteCourseById = async function (id) {
+  const db = getDBRef();
+  const collection = db.collection('courses')
+  const result = await collection.deleteOne({
+    _id: new ObjectId(id)
+  })
+  return result.deletedCount
+}
