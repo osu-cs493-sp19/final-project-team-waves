@@ -234,6 +234,21 @@ db.businesses.insertMany([
   }
 ])
 
+db.users.insertMany([
+  {
+    "name":"root",
+    "email":"root@gmail.biz",
+    "password":"adminPword",
+    "role":"admin"
+  },
+  {
+    "name":"studentInit",
+    "email":"student@gmail.biz",
+    "password":"hunterpass",
+    "role":"student"
+  }
+])
+
 db.courses.insertMany([
   {
     "subject": "CS",
