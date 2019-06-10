@@ -25,11 +25,21 @@ async function insertAssignment(assignment) {
 async function getAssignmentById(id) {
     const collection = getAssignmentsCollection();
 
-    const assignment = collection.findOne({
+    const assignment = await collection.findOne({
         _id: createObjectId(id)
     });
 
     return assignment;
+}
+
+async function getAssignmentsByCourseId(id) {
+    const collection = getAssignmentsCollection();
+
+    const assignments = await collection.find({
+        courseId: id
+    }).toArray();
+
+    return assignments;
 }
 
 async function updateAssignmentById(id, assignment) {
@@ -58,6 +68,7 @@ module.exports = {
     ASSIGNMENT_SCHEMA,
     insertAssignment,
     getAssignmentById,
+    getAssignmentsByCourseId,
     updateAssignmentById,
     deleteAssignmentById
 };
