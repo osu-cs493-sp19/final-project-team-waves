@@ -16,7 +16,8 @@ const {
 const {
     SUBMISSION_SCHEMA,
     saveSubmissionFile,
-    getSubmissionsByFields
+    getSubmissionsByFields,
+    deleteSubmissionsByAssignmentId
 } = require("../models/submissions");
 
 exports.router = router;
@@ -126,15 +127,18 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-// TODO: Add authentication and remove all submissions for assignment
+// TODO: Add authentication
 router.delete("/:id", async (req, res) => {
     const id = req.params.id;
 
     try {
         const isAssignmentDeleted = await deleteAssignmentById(id);
 
-        if (isAssignmentDeleted)
+        if (isAssignmentDeleted) {
+            const submissionsDeleted = deleteSubmissionsByAssignmentId(id);
+
             res.status(204).end();
+        }
 
         else {
             res.status(404).json({
@@ -214,6 +218,7 @@ router.post("/:id/submissions", upload.single("file"), async (req, res) => {
 
                 const metadata = Object.assign(
                     {
+                        contentType: req.file.mimetype,
                         file: req.file.filename
                     }, 
                     extractValidFields(req.body, SUBMISSION_SCHEMA)

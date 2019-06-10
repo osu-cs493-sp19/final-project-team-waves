@@ -1,7 +1,7 @@
 const { getSubmissionDownloadStreamByFilename } = require("../models/submissions");
 const router = require('express').Router();
 
-router.use("/assignments", require("../api/assignments").router);
+router.use("/assignments", require("./assignments").router);
 router.use("/courses", require("./courses"))
 
 router.get("/media/submissions/:filename", (req, res, next) => {
