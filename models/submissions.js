@@ -46,6 +46,37 @@ async function getSubmissionsByFields(fields) {
     return submissions;
 }
 
+async function getPaginatedSubmissionsByFields(fields, paginationOptions) {
+    const bucket = getSubmissionsBucket();
+    let submissions = await bucket.find(fields);
+
+    const count = await submissions.count();
+    const pageSize = paginationOptions.pageSize || 2;
+    
+    let lastPage = Math.ceil(count / pageSize);
+    lastPage = lastPage <= 0 ? 1 : lastPage;
+    
+    let page = paginationOptions.page || 1;
+    page = page < 1 ? 1 : page;
+    page = page > lastPage ? lastPage : page;
+
+    const offset = (page - 1) * pageSize;
+
+    submissions = await submissions
+        .sort({ _id: 1 })
+        .skip(offset)
+        .limit(pageSize)
+        .toArray();
+
+    return {
+        submissions: submissions,
+        page: page,
+        pageSize: pageSize,
+        totalPages: lastPage,
+        count: count
+    };
+}
+
 function getSubmissionDownloadStreamByFilename(filename) {
     const bucket = getSubmissionsBucket();
     
@@ -71,6 +102,7 @@ module.exports = {
     saveSubmissionFile,
     getSubmissionById,
     getSubmissionsByFields,
+    getPaginatedSubmissionsByFields,
     getSubmissionDownloadStreamByFilename,
     deleteSubmissionsByAssignmentId
 };
