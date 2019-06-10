@@ -12,10 +12,8 @@ const { validateAgainstSchema } = require('../lib/validation')
 const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById } = require('../models/courses')
 
 router.get('/', async (req, res, next) => {
-    console.log("GET courses/")
     try {
         const db = getDBRef();
-        console.log("db", db)
         const collection = db.collection('courses');
         let count = 0;
         collection.count({}).then(function (val) {
