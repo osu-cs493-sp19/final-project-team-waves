@@ -16,7 +16,8 @@ const {
 const {
     SUBMISSION_SCHEMA,
     saveSubmissionFile,
-    getSubmissionsByFields
+    getPaginatedSubmissionsByFields,
+    deleteSubmissionsByAssignmentId
 } = require("../models/submissions");
 
 exports.router = router;
@@ -126,15 +127,18 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-// TODO: Add authentication and remove all submissions for assignment
+// TODO: Add authentication
 router.delete("/:id", async (req, res) => {
     const id = req.params.id;
 
     try {
         const isAssignmentDeleted = await deleteAssignmentById(id);
 
-        if (isAssignmentDeleted)
+        if (isAssignmentDeleted) {
+            const submissionsDeleted = deleteSubmissionsByAssignmentId(id);
+
             res.status(204).end();
+        }
 
         else {
             res.status(404).json({
@@ -152,26 +156,31 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-// TODO: Add authentication, pagination
+// TODO: Add authentication
 router.get("/:id/submissions", async (req, res) => {
     try {
         const id = req.params.id;
         const assignment = await getAssignmentById(id);
 
         if (assignment) {
-            const page = req.query.page || 1;
+            let page = parseInt(req.query.page) || 1;
+            page = page < 1 ? 1 : page;
+            
+            const searchFields = { "metadata.assignmentId": id };
             const studentId = req.query.studentId;
-            const searchFields = {
-                "metadata.assignmentId": id
-            };
 
             if (studentId)
                 searchFields["metadata.studentId"] = studentId;
 
-            const submissions = await getSubmissionsByFields(searchFields);
+            const paginationOptions = {
+                page: page,
+                pageSize: 2
+            };
+
+            const pagedSubmissions = await getPaginatedSubmissionsByFields(searchFields, paginationOptions);
             const response = { submissions: [] };
 
-            for(const submission of submissions) {
+            for(const submission of pagedSubmissions.submissions) {
                 response.submissions.push({
                     assignmentId: submission.metadata.assignmentId,
                     studentId: submission.metadata.studentId,
@@ -179,6 +188,35 @@ router.get("/:id/submissions", async (req, res) => {
                     file: `/media/submissions/${submission.metadata.file}`
                 });
             }
+
+            response.pageNumber = pagedSubmissions.page;
+            response.totalPages = pagedSubmissions.totalPages;
+            response.pageSize = pagedSubmissions.pageSize;
+            response.totalCount = pagedSubmissions.count;
+
+            const links = {};
+
+            if (pagedSubmissions.page > 1) {
+                links.prevPage = `/assignments/${id}/submissions?page=${pagedSubmissions.page - 1}`;
+                links.firstPage = `/assignments/${id}/submissions?page=1`;
+
+                if (studentId) {
+                    links.prevPage += `&studentId=${studentId}`;
+                    links.firstPage += `&studentId=${studentId};`
+                }
+            }
+
+            if (pagedSubmissions.page < pagedSubmissions.totalPages) {
+                links.nextPage = `/assignments/${id}/submissions?page=${pagedSubmissions.page + 1}`;
+                links.lastPage = `/assignments/${id}/submissions?page=${pagedSubmissions.totalPages}`;
+
+                if (studentId) {
+                    links.nextPage += `&studentId=${studentId}`;
+                    links.lastPage += `&studentId=${studentId}`;
+                }
+            }
+
+            response.links = links;
 
             res.status(200).json(response);
         }
@@ -214,6 +252,7 @@ router.post("/:id/submissions", upload.single("file"), async (req, res) => {
 
                 const metadata = Object.assign(
                     {
+                        contentType: req.file.mimetype,
                         file: req.file.filename
                     }, 
                     extractValidFields(req.body, SUBMISSION_SCHEMA)
