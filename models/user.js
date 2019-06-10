@@ -55,6 +55,44 @@ async function getUserById(id, includePassword) {
 };
 exports.getUserById = getUserById;
 
+//get all courses where student = id is enrolled in
+async function getCoursesByStudentId(id) {
+
+  const db = getDBRef();
+  const collection = db.collection('courses');
+  //if (!ObjectId.isValid(id)) {
+  //  return null;
+  //} else {
+    //const projection = includePassword ? {} : { password: 0 };
+    const results = await collection
+      .find({ _id: new ObjectId(id) })
+      .project(projection)
+      .toArray();
+    //return results[0];
+  //}
+
+  return "tempcoursesby_STRUDENT_-ID";
+};
+exports.getCoursesByStudentId = getCoursesByStudentId;
+
+async function getCoursesByInstructorId(id) {
+  const db = getDBRef();
+  const collection = db.collection('courses');
+  //if (!ObjectId.isValid(id)) {
+  //  return null;
+  //} else {
+    //const projection = includePassword ? {} : { password: 0 };
+    const results = await collection
+      .find({ instructorId: id })
+      .project(projection)
+      .toArray();
+    //return results;
+  //}
+  return "tempcoursesbyinstructorID";
+};
+exports.getCoursesByInstructorId = getCoursesByInstructorId;
+
+
 /*
  * Fetch a user from the DB based on user ID.
  */

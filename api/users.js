@@ -6,7 +6,7 @@ const router = require('express').Router();
 
 const { validateAgainstSchema } = require('../lib/validation');
 const { generateAuthToken, requireAuthentication } = require('../lib/auth');
-const { UserSchema, insertNewUser, getUserById, validateUser } = require('../models/user');
+const { UserSchema, insertNewUser, getUserById, validateUser, getCoursesByInstructorId, getCoursesByStudentId } = require('../models/user');
 
 //add new user
 //only someone with admin auth can create admin or instructor
@@ -108,19 +108,36 @@ router.post('/login', async (req, res) => {
 
 router.get('/:id', requireAuthentication, async (req, res, next) => {
   //if request id is same of user making request
-  console.log("get /id")
-  console.log("req.params.id = ", req.params.id)
-  console.log("req.user = ", req.user)
-  console.log("req.userId = ", req.userId)
-
-  //console.log("req = ", req)
-
-  //if (req.params.id === req.user) {
   if (req.params.id === req.userId) {
+
+    console.log("role of auth'd user making request: req.role = ", req.role)
+    //if req.role =="instructor", include list of all id's of courses where instructorId == req.params.id
+    //if req.role =="student", include list of all ids of courses where student is enrolled in
+
     try {
       const user = await getUserById(req.params.id);
       if (user) {
-        res.status(200).send(user);
+
+        if(req.role == "instructor"){
+          const instructorCourses = await getCoursesByInstructorId(req.params.id);
+          res.status(200).send({
+            user: user,
+            courses: instructorCourses
+          });
+
+        }else if(req.role == "student"){
+          const studentCourses = await getCoursesByStudentId(req.params.id);
+          res.status(200).send({
+            user: user,
+            courses: studentCourses
+          });
+        }else{
+          //res.status(200).send(user);
+          res.status(200).send({
+            user: user
+          });
+        }
+
       } else {
         next();
       }
