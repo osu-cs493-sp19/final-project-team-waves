@@ -107,26 +107,42 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/:id', requireAuthentication, async (req, res, next) => {
+  console.log("req.email = ", req.email)
+/*
+  console.log("req.params.id = ", req.params.id)
+  console.log(typeof req.params.id)
+  console.log("req.userId    = ", req.userId)
+  console.log(typeof req.userId)
+  userIdString = String(req.userId)
+  console.log("userIdString = ", userIdString)
+  console.log(typeof userIdString)
+*/
   //if request id is same of user making request
-  if (req.params.id === req.userId) {
+  //if (req.params.id === req.userId) {
+  if(req.params.id == String(req.userId)){
 
     console.log("role of auth'd user making request: req.role = ", req.role)
     //if req.role =="instructor", include list of all id's of courses where instructorId == req.params.id
     //if req.role =="student", include list of all ids of courses where student is enrolled in
 
     try {
-      const user = await getUserById(req.params.id);
+      //getUserByEmail(req.email, false)
+      const user = await getUserById(req.params.id, false);
+      console.log("user = ", user)
+
       if (user) {
 
         if(req.role == "instructor"){
-          const instructorCourses = await getCoursesByInstructorId(req.params.id);
+          //const instructorCourses = await getCoursesByInstructorId(req.params.id);
+          const instructorCourses = "tempinstructorCourses";
           res.status(200).send({
             user: user,
             courses: instructorCourses
           });
 
         }else if(req.role == "student"){
-          const studentCourses = await getCoursesByStudentId(req.params.id);
+          //const studentCourses = await getCoursesByStudentId(req.params.id);
+          const studentCourses = "tempStudentCourses";
           res.status(200).send({
             user: user,
             courses: studentCourses
