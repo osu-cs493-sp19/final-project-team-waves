@@ -9,7 +9,7 @@ const { getDBRef } = require('../lib/mongo');
 
 const { validateAgainstSchema } = require('../lib/validation')
 
-const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById } = require('../models/courses')
+const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById } = require('../models/courses')
 
 router.get('/', async (req, res, next) => {
     console.log("GET courses/")
@@ -105,9 +105,16 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
-router.patch('/:id', (req, res, next) => {
+router.patch('/:id', async (req, res, next) => {
     try {
-        res.status(200).send();
+    if (validateAgainstSchema(req.body, CourseSchema)) {
+
+        const result = await updateCourseById(req.params.id, req.body)
+        if (result === 1) 
+            res.status(200).send();
+        else
+            res.status(400).send()
+    }
     } catch (err) {
         next(err);
     }

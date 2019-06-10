@@ -64,3 +64,12 @@ exports.deleteCourseById = async function (id) {
   })
   return result.deletedCount
 }
+
+exports.updateCourseById = async function (id, freshCourse) {
+  const db = getDBRef();
+  const collection = db.collection('courses')
+  const result =  await collection
+      .findAndModify({ _id: new ObjectId(id)}, {$update: freshCourse }, freshCourse)
+      console.log(result)
+  return result.matchedCount
+}
