@@ -238,13 +238,13 @@ db.users.insertMany([
   {
     "name":"root",
     "email":"root@gmail.biz",
-    "password":"adminPword",
+    "password":"$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
     "role":"admin"
   },
   {
     "name":"studentInit",
     "email":"student@gmail.biz",
-    "password":"hunterpass",
+    "password":"$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
     "role":"student"
   }
 ])
