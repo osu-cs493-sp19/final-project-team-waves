@@ -150,13 +150,13 @@ router.get('/:id/students', async (req, res, next) => {
 router.post('/:id/students', async (req, res, next) => {
     try {
         const userIdsToAdd = req.body.add // An array of user Ids to enroll in the course
-        userIdsToAdd.forEach(element => {
-            const insertedId = await insertEnrollment({ courseId: req.params.id, userId: element})
-        });
+        for (let element of userIdsToAdd) {
+            await insertEnrollment({ courseId: req.params.id, userId: element})
+        };
         const usersToRemove = req.body.remove
-        usersToRemove.forEach(element => {
-            const insertedId = await insertEnrollment({ courseId: req.params.id, userId: element})
-        });
+        for (let element of usersToRemove) {
+            await deleteEnrollmentsByFields({ courseId: req.params.id, userId: element})
+        };
         res.status(200).send();
     } catch (err) {
         next(err);
