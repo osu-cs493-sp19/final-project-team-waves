@@ -5,6 +5,8 @@
 
 const router = require('express').Router();
 
+const path = require("path");
+
 const { getDBRef } = require('../lib/mongo');
 
 const fs = require("fs");
@@ -18,6 +20,10 @@ const { getEnrollmentsByFields, insertEnrollment } = require('../models/enrollme
 const { getAssignmentsByCourseId } = require('../models/assignment')
 
 const Json2csvParser = require('json2csv').Parser;
+
+const { Parser } = require('json2csv');
+
+const { getUserById } = require('../models/user')
 
 router.get('/', async (req, res, next) => {
     try {
@@ -91,7 +97,7 @@ router.post('/', async (req, res, next) => {
         } catch (err) {
           console.error(err);
           res.status(500).send({
-            error: "Failed to insert lodging.  Try again later."
+            error: "Failed to insert course.  Try again later."
           });
         }
       } else {
@@ -151,7 +157,8 @@ router.post('/:id/students', async (req, res, next) => {
     try {
         const userIdsToAdd = req.body.add // An array of user Ids to enroll in the course
         for (let element of userIdsToAdd) {
-            await insertEnrollment({ courseId: req.params.id, userId: element})
+            let user = getUserById(element, false)
+            await insertEnrollment({ courseId: req.params.id, name: user.name, email: user.email, userId: element})
         };
         const usersToRemove = req.body.remove
         for (let element of usersToRemove) {
@@ -168,29 +175,11 @@ router.get('/:id/roster', async (req, res, next) => {
         let fields = ["UserId"]
         const retval = await getEnrollmentsByFields({ courseId: req.params.id })
 
-        const json2csvParser = new Json2csvParser({ fields });
-        const result = json2csvParser.parse(retval);
+        const parser = new Parser(fields);
+        const csv = parser.parse(retval);
 
-        fs.writeFile("localPath/test.csv", [result], "utf8", function (err) {
-            if (err) {
-                console.log('Some error occured - file either not saved or corrupted file saved.');
-            } else{
-                console.log('It\'s saved!');
-            }
-        });
+        res.send(Buffer.from(csv))
 
-        // var filePath = path.join('localPath/test.csv');
-        var stat = fs.statSync('localPath/test.csv');
-    
-        response.writeHead(200, {
-            'Content-Type': 'text/csv',
-            'Content-Length': stat.size
-        });
-    
-        var readStream = fileSystem.createReadStream('localPath/test.csv');
-
-        readStream.pipe(response);
-        res.status(200).send();
     } catch (err) {
         next(err);
     }
