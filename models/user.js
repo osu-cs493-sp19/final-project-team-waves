@@ -59,16 +59,17 @@ exports.getUserById = getUserById;
 async function getCoursesByStudentId(id) {
 
   const db = getDBRef();
-  const collection = db.collection('courses');
+  const collection = db.collection('enrollments');
   //if (!ObjectId.isValid(id)) {
   //  return null;
   //} else {
-    //const projection = includePassword ? {} : { password: 0 };
+    includePassword = false;
+    const projection = includePassword ? {} : { password: 0 };
     const results = await collection
-      .find({ _id: new ObjectId(id) })
+      .find({ userId: id })
       .project(projection)
       .toArray();
-    //return results[0];
+    return results;
   //}
 
   return "tempcoursesby_STRUDENT_-ID";
@@ -81,14 +82,15 @@ async function getCoursesByInstructorId(id) {
   //if (!ObjectId.isValid(id)) {
   //  return null;
   //} else {
-    //const projection = includePassword ? {} : { password: 0 };
+    includePassword = false;
+    const projection = includePassword ? {} : { password: 0 };
     const results = await collection
       .find({ instructorId: id })
       .project(projection)
       .toArray();
-    //return results;
+    return results;
   //}
-  return "tempcoursesbyinstructorID";
+  //return "tempcoursesbyinstructorID";
 };
 exports.getCoursesByInstructorId = getCoursesByInstructorId;
 

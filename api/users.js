@@ -133,16 +133,16 @@ router.get('/:id', requireAuthentication, async (req, res, next) => {
       if (user) {
 
         if(req.role == "instructor"){
-          //const instructorCourses = await getCoursesByInstructorId(req.params.id);
-          const instructorCourses = "tempinstructorCourses";
+          const instructorCourses = await getCoursesByInstructorId(req.params.id);
+          //const instructorCourses = "tempinstructorCourses";
           res.status(200).send({
             user: user,
             courses: instructorCourses
           });
 
         }else if(req.role == "student"){
-          //const studentCourses = await getCoursesByStudentId(req.params.id);
-          const studentCourses = "tempStudentCourses";
+          const studentCourses = await getCoursesByStudentId(req.params.id);
+          //const studentCourses = "tempStudentCourses";
           res.status(200).send({
             user: user,
             courses: studentCourses
