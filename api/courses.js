@@ -112,7 +112,7 @@ router.patch('/:id', async (req, res, next) => {
     if (validateAgainstSchema(req.body, CourseSchema)) {
 
         const result = await updateCourseById(req.params.id, req.body)
-        if (result === 1) 
+        if (result === 1)
             res.status(200).send();
         else
             res.status(400).send()
@@ -134,7 +134,7 @@ router.delete('/:id', async (req, res, next) => {
     }
 })
 
-router.get('/:id/students', (req, res, next) => {
+router.get('/:id/students', async (req, res, next) => {
     try {
         const result = await getEnrollmentsByFields(req.params.id)
         res.status(200).json(result);
@@ -143,7 +143,7 @@ router.get('/:id/students', (req, res, next) => {
     }
 })
 
-router.post('/:id/students', (req, res, next) => {
+router.post('/:id/students', async (req, res, next) => {
     try {
         const insertedId = await insertEnrollment(req.params.id)
         res.status(201).send({
@@ -154,7 +154,7 @@ router.post('/:id/students', (req, res, next) => {
     }
 })
 
-router.post('/:id/roster', (req, res, next) => {
+router.post('/:id/roster', async (req, res, next) => {
     try {
         res.status(200).send();
     } catch (err) {
@@ -162,7 +162,7 @@ router.post('/:id/roster', (req, res, next) => {
     }
 })
 
-router.post('/:id/assignments', (req, res, next) => {
+router.post('/:id/assignments', async (req, res, next) => {
     try {
         const result = await getAssignmentsByCourseId(req.params.id)
         res.status(200).json(result);
