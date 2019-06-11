@@ -120,7 +120,7 @@ function startServer() {
       console.log(err);
 
       setTimeout(() => {
-        startServer
+        startServer();
       }, 2500);
     });
 }
