@@ -25,6 +25,10 @@ const {
     getCourseById
 } = require("../models/courses");
 
+const {
+    getEnrollmentsByFields
+} = require("../models/enrollments");
+
 exports.router = router;
 
 async function getInstructorId(assignment) {
@@ -34,6 +38,12 @@ async function getInstructorId(assignment) {
         return course.instructorId;
 
     return null;
+}
+
+async function isStudentEnrolled(userId, assignment) {
+    const course = await getEnrollmentsByFields({ courseId: assignment.courseId, userId: userId });
+
+    return course && course.length > 0;
 }
 
 const upload = multer({
@@ -282,31 +292,38 @@ router.get("/:id/submissions", requireAuthentication, async (req, res) => {
     }
 });
 
-// TODO: Add authentication
-router.post("/:id/submissions", upload.single("file"), async (req, res) => {
+router.post("/:id/submissions", upload.single("file"), requireAuthentication, async (req, res) => {
     if (req.file && validateAgainstSchema(req.body, SUBMISSION_SCHEMA)) {
         try {
             const id = req.params.id;
             const assignment = await getAssignmentById(id);
 
             if (assignment) {
-                const submission = {
-                    path: req.file.path,
-                    filename: req.file.filename
-                };
+                if (req.userIsStudent && await isStudentEnrolled(req.userId, assignment)) {
+                    const submission = {
+                        path: req.file.path,
+                        filename: req.file.filename
+                    };
 
-                const metadata = Object.assign(
-                    {
-                        contentType: req.file.mimetype,
-                        file: req.file.filename
-                    }, 
-                    extractValidFields(req.body, SUBMISSION_SCHEMA)
-                );
+                    const metadata = Object.assign(
+                        {
+                            contentType: req.file.mimetype,
+                            file: req.file.filename
+                        }, 
+                        extractValidFields(req.body, SUBMISSION_SCHEMA)
+                    );
 
-                const id = await saveSubmissionFile(submission, metadata);
-                await removeFile(req.file.path);
+                    const id = await saveSubmissionFile(submission, metadata);
+                    await removeFile(req.file.path);
 
-                res.status(201).json();
+                    res.status(201).json();
+                }
+
+                else {
+                    res.status(403).json({
+                        error: "The request was not made by an authenticated User."
+                    });
+                }
             }
 
             else {
