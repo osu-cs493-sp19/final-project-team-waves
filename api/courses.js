@@ -11,6 +11,10 @@ const { validateAgainstSchema } = require('../lib/validation')
 
 const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById } = require('../models/courses')
 
+const { getEnrollmentsByFields, insertEnrollment } = require('../models/enrollments')
+
+const { getAssignmentsByCourseId } = require('../models/assignment')
+
 router.get('/', async (req, res, next) => {
     try {
         const db = getDBRef();
@@ -132,7 +136,8 @@ router.delete('/:id', async (req, res, next) => {
 
 router.get('/:id/students', (req, res, next) => {
     try {
-        res.status(200).send();
+        const result = await getEnrollmentsByFields(req.params.id)
+        res.status(200).json(result);
     } catch (err) {
         next(err);
     }
@@ -140,7 +145,10 @@ router.get('/:id/students', (req, res, next) => {
 
 router.post('/:id/students', (req, res, next) => {
     try {
-        res.status(200).send();
+        const insertedId = await insertEnrollment(req.params.id)
+        res.status(201).send({
+            id: insertedId
+          });
     } catch (err) {
         next(err);
     }
@@ -156,7 +164,8 @@ router.post('/:id/roster', (req, res, next) => {
 
 router.post('/:id/assignments', (req, res, next) => {
     try {
-        res.status(200).send();
+        const result = await getAssignmentsByCourseId(req.params.id)
+        res.status(200).json(result);
     } catch (err) {
         next(err);
     }
