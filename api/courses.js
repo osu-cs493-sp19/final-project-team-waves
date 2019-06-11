@@ -15,6 +15,8 @@ const { getEnrollmentsByFields, insertEnrollment } = require('../models/enrollme
 
 const { getAssignmentsByCourseId } = require('../models/assignment')
 
+const Json2csvParser = require('json2csv').Parser;
+
 router.get('/', async (req, res, next) => {
     try {
         const db = getDBRef();
@@ -136,7 +138,7 @@ router.delete('/:id', async (req, res, next) => {
 
 router.get('/:id/students', async (req, res, next) => {
     try {
-        const result = await getEnrollmentsByFields(req.params.id)
+        const result = await getEnrollmentsByFields({ courseId: req.params.id })
         res.status(200).json(result);
     } catch (err) {
         next(err);
@@ -156,6 +158,31 @@ router.post('/:id/students', async (req, res, next) => {
 
 router.post('/:id/roster', async (req, res, next) => {
     try {
+        let fields = ["UserId"]
+        const retval = await getEnrollmentsByFields({ courseId: req.params.id })
+
+        const json2csvParser = new Json2csvParser({ fields });
+        const result = json2csvParser.parse(retval);
+
+        fs.writeFile("localPath/test.csv", [result], "utf8", function (err) {
+            if (err) {
+                console.log('Some error occured - file either not saved or corrupted file saved.');
+            } else{
+                console.log('It\'s saved!');
+            }
+        });
+
+        // var filePath = path.join('localPath/test.csv');
+        var stat = fileSystem.statSync('localPath/test.csv');
+    
+        response.writeHead(200, {
+            'Content-Type': 'text/csv',
+            'Content-Length': stat.size
+        });
+    
+        var readStream = fileSystem.createReadStream('localPath/test.csv');
+
+        readStream.pipe(response);
         res.status(200).send();
     } catch (err) {
         next(err);
