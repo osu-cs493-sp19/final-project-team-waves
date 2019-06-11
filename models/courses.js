@@ -40,6 +40,18 @@ exports.getLodgingsPage = async function (page) {
   };
 };
 
+//receives courseId, returns instructorID of that course
+exports.getInstructorIdOfCourse  = async function (id){
+  console.log("getting instructorID of course with id = ", id)
+  const db = getDBRef();
+  const collection = db.collection('courses')
+  //get all courses with that courseid
+  const results =  await collection.find({ _id: new ObjectId(id) }).toArray();
+  //const all_results = await collection.find({ }).toArray();
+
+  return String(results[0]['instructorId'])
+}
+
 exports.insertNewCourse = async function (course) {
   const db = getDBRef();
   const collection = db.collection('courses');

@@ -11,9 +11,11 @@ const { getDBRef } = require('../lib/mongo');
 
 const fs = require("fs");
 
+const { generateAuthToken, requireAuthentication } = require('../lib/auth');
+
 const { validateAgainstSchema } = require('../lib/validation')
 
-const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById } = require('../models/courses')
+const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById, getInstructorIdOfCourse  } = require('../models/courses')
 
 const { getEnrollmentsByFields, insertEnrollment } = require('../models/enrollments')
 
@@ -144,13 +146,46 @@ router.delete('/:id', async (req, res, next) => {
     }
 })
 
-router.get('/:id/students', async (req, res, next) => {
-    try {
-        const result = await getEnrollmentsByFields({ courseId: req.params.id })
-        res.status(200).json(result);
-    } catch (err) {
-        next(err);
+router.post('/:id/students', requireAuthentication, async (req, res, next) => {
+
+    console.log("role of auth'd user making request: req.role = ", req.role)
+    console.log("id of auth'd user making request: req.userId = ", req.userId)
+    const instructorIdOfCourse = await getInstructorIdOfCourse(req.params.id);
+    console.log("id of instructor teaching course we're trying to add to = ", instructorIdOfCourse)
+
+    if(instructorIdOfCourse == ""){
+      res.status(404).send();
+    }else{
+
+      //if user is admin or use is instructor whose id matches instrucotr id of couse
+      if(req.role == "admin" || (req.role == "instructor" && req.userId == instructorIdOfCourse) ){
+        console.log("you have correct auth to enroll a student")
+
+        try {
+            const userIdsToAdd = req.body.add // An array of user Ids to enroll in the course
+            for (let element of userIdsToAdd) {
+                await insertEnrollment({ courseId: req.params.id, userId: element})
+            };
+            const usersToRemove = req.body.remove
+            for (let element of usersToRemove) {
+                await deleteEnrollmentsByFields({ courseId: req.params.id, userId: element})
+            };
+            res.status(200).send();
+        } catch (err) {
+            next(err);
+        }
+
+      }else{
+        console.log("you dont have correct auth to enroll a student")
+        res.status(403).send();
+      }
+
     }
+
+
+
+
+
 })
 
 router.post('/:id/students', async (req, res, next) => {
