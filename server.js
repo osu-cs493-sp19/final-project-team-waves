@@ -22,6 +22,11 @@ const redisPort = process.env.REDIS_PORT || 6379;
 const redisHost = process.env.REDIS_HOST;
 const redisClient = redis.createClient(redisPort, redisHost); // from redis package. Create client to communicate w/ server
 
+redisClient.on("error", (err) => {
+  console.log("REDIS NOOO!");
+  console.log(err);
+});
+
 const rateLimitWindowMillis = 60000;
 const rateLimitWindowMaxRequests = 5; // max 5 requests per 60000ms
 
@@ -102,6 +107,8 @@ app.use('*', function (req, res) {
 });
 
 function startServer() {
+  console.log("Starting server...");
+
   connectToDB()
     .then(() => {
       app.listen(port, function() {
@@ -118,4 +125,4 @@ function startServer() {
     });
 }
 
-startServer();
+redisClient.on("ready", startServer);
