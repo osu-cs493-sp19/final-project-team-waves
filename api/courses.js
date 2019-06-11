@@ -7,6 +7,8 @@ const router = require('express').Router();
 
 const { getDBRef } = require('../lib/mongo');
 
+const fs = require("fs");
+
 const { validateAgainstSchema } = require('../lib/validation')
 
 const { CourseSchema, insertNewCourse, getCourseById, deleteCourseById, updateCourseById } = require('../models/courses')
@@ -147,16 +149,21 @@ router.get('/:id/students', async (req, res, next) => {
 
 router.post('/:id/students', async (req, res, next) => {
     try {
-        const insertedId = await insertEnrollment(req.params.id)
-        res.status(201).send({
-            id: insertedId
-          });
+        const userIdsToAdd = req.body.add // An array of user Ids to enroll in the course
+        userIdsToAdd.forEach(element => {
+            const insertedId = await insertEnrollment({ courseId: req.params.id, userId: element})
+        });
+        const usersToRemove = req.body.remove
+        usersToRemove.forEach(element => {
+            const insertedId = await insertEnrollment({ courseId: req.params.id, userId: element})
+        });
+        res.status(200).send();
     } catch (err) {
         next(err);
     }
 })
 
-router.post('/:id/roster', async (req, res, next) => {
+router.get('/:id/roster', async (req, res, next) => {
     try {
         let fields = ["UserId"]
         const retval = await getEnrollmentsByFields({ courseId: req.params.id })
@@ -173,7 +180,7 @@ router.post('/:id/roster', async (req, res, next) => {
         });
 
         // var filePath = path.join('localPath/test.csv');
-        var stat = fileSystem.statSync('localPath/test.csv');
+        var stat = fs.statSync('localPath/test.csv');
     
         response.writeHead(200, {
             'Content-Type': 'text/csv',
@@ -189,7 +196,7 @@ router.post('/:id/roster', async (req, res, next) => {
     }
 })
 
-router.post('/:id/assignments', async (req, res, next) => {
+router.get('/:id/assignments', async (req, res, next) => {
     try {
         const result = await getAssignmentsByCourseId(req.params.id)
         res.status(200).json(result);
