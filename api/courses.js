@@ -157,7 +157,8 @@ router.post('/:id/students', async (req, res, next) => {
     try {
         const userIdsToAdd = req.body.add // An array of user Ids to enroll in the course
         for (let element of userIdsToAdd) {
-            let user = getUserById(element, false)
+            let user = await getUserById(element, false)
+            console.log("user", user)
             await insertEnrollment({ courseId: req.params.id, name: user.name, email: user.email, userId: element})
         };
         const usersToRemove = req.body.remove

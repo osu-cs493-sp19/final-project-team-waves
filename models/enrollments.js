@@ -3,7 +3,9 @@ const { getDBRef } = require("../lib/mongo");
 
 const ENROLLMENT_SCHEMA = {
     courseId: { required: true },
-    userId: { required: true }
+    userId: { required: true },
+    name: { require: false},
+    email: { require: false}
 };
 
 const ENROLLMENT_COLLECTION_NAME = "enrollments";
