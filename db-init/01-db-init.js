@@ -1,8 +1,8 @@
 db.users.insertMany([
   {
     "name":"root",
-    "email":"root@gmail.biz",
-    "password":"$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
+    "email":"admin@gmail.biz",
+    "password":"$2a$08$gXo1WPX4qmJBGigesDjWAuoSstNCAE.1F/JWDRCgxTpLzxU6RtNZK",
     "role":"admin"
   },
   {
