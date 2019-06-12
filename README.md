@@ -1,4 +1,10 @@
 CS 493 Final Project
+Team Waves
+Martin Barker
+Lauren Gastineau
+Fauzi Kliman
+Nathan Tan
+
 Code and demo due by 5:00pm on Friday, 6/14/2019
 API architecture/design document due on Canvas by 5:00pm on
 	Friday, 6/14/2019
