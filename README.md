@@ -1,8 +1,9 @@
 CS 493 Final Project
-Team Waves
-Martin Barker
-Lauren Gastineau
-Fauzi Kliman
+
+Team Waves:
+Martin Barker,
+Lauren Gastineau,
+Fauzi Kliman,
 Nathan Tan
 
 Code and demo due by 5:00pm on Friday, 6/14/2019
