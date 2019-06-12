@@ -127,23 +127,23 @@ router.put("/:id", requireAuthentication, async (req, res) => {
         try {
             const assignment = await getAssignmentById(id);
 
-            if (req.userIsAdmin || (req.userIsInstructor && req.userId === await getInstructorId(assignment))) {
-                if (assignment) {
+            if (assignment) {
+                if (req.userIsAdmin || (req.userIsInstructor && req.userId === await getInstructorId(assignment))) {
                     const updatedAssignment = updateAssignmentById(id, assignmentUpdate);
 
                     res.status(200).json();
                 }
 
                 else {
-                    res.status(404).json({
-                        error: `Specified Assignment ${id} not found.`
+                    res.status(403).json({
+                        error: "The request was not made by an authenticated User."
                     });
                 }
             }
 
             else {
-                res.status(403).json({
-                    error: "The request was not made by an authenticated User."
+                res.status(404).json({
+                    error: `Specified Assignment ${id} not found.`
                 });
             }
         }
